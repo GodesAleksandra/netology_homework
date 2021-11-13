@@ -57,15 +57,15 @@
 		Данное условное выражение проверяет наличие каталога /tmp
 		
 12. Основываясь на знаниях о просмотре текущих (например, PATH) и установке новых переменных; командах, которые мы рассматривали, добейтесь в выводе type -a bash в виртуальной машине наличия первым пунктом в списке:
-    	bash is /tmp/new_path_directory/bash
-	bash is /usr/local/bin/bash
-	bash is /bin/bash
+		bash is /tmp/new_path_directory/bash
+		bash is /usr/local/bin/bash
+		bash is /bin/bash
 	
 	Команды:
 	
-	mkdir /tmp/new_path_dir/
-	cp /bin/bash /tmp/new_path_dir/
-	PATH=/tmp/new_path_dir/:$PATH
+		mkdir /tmp/new_path_dir/
+		cp /bin/bash /tmp/new_path_dir/
+		PATH=/tmp/new_path_dir/:$PATH
 	
 13. Чем отличается планирование команд с помощью batch и at?
 
@@ -75,5 +75,5 @@
 	
 14. Выйти из терминала Ubuntu с помощью команды exit
     Далее: 
-	vagrant suspend
+		vagrant suspend
     
