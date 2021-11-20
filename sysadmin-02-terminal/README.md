@@ -52,9 +52,13 @@
    то будет получена ошибка, так как такого дескриптора нет
    
    In: echo netology > /proc/$$/fd/5
+	
    -bash: /proc/13353/fd/5: No such file or directory
+	
    In: bash 5>&1
+	
    In: echo netology > /proc/$$/fd/5
+	
    Out: netology
 
 8. Получится ли в качестве входного потока для pipe использовать только stderr команды, не потеряв при этом отображение stdout на pty? 
