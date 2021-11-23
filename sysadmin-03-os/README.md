@@ -140,6 +140,4 @@
    
    l    is multi-threaded
    
-   +    is in the foreground process group
-   
   
