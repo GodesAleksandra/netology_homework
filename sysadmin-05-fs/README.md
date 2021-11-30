@@ -204,6 +204,27 @@
 
 14. Прикрепите вывод `lsblk`.
 
+        vagrant@vagrant:~$ lsblk
+        NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
+        sda                    8:0    0   64G  0 disk
+        ├─sda1                 8:1    0  512M  0 part  /boot/efi
+        ├─sda2                 8:2    0    1K  0 part
+        └─sda5                 8:5    0 63.5G  0 part
+          ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
+          └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
+        sdb                    8:16   0  2.5G  0 disk
+        ├─sdb1                 8:17   0    2G  0 part
+        │ └─md1                9:1    0    2G  0 raid1
+        └─sdb2                 8:18   0  511M  0 part
+          └─md0                9:0    0  510M  0 raid1
+            └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+        sdc                    8:32   0  2.5G  0 disk
+        ├─sdc1                 8:33   0    2G  0 part
+        │ └─md1                9:1    0    2G  0 raid1
+        └─sdc2                 8:34   0  511M  0 part
+          └─md0                9:0    0  510M  0 raid1
+            └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+
 15. Протестируйте целостность файла:
 
     ```bash
@@ -211,12 +232,60 @@
     root@vagrant:~# echo $?
     0
     ```
+    
+        vagrant@vagrant:~$ sudo gzip -t /tmp/new/test.gz
+        vagrant@vagrant:~$ sudo echo $?
+        0
 
 16. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.
 
+        vagrant@vagrant:~$ sudo pvmove /dev/md0
+          /dev/md0: Moved: 72.00%
+          /dev/md0: Moved: 100.00%
+        vagrant@vagrant:~$ lsblk
+        NAME                 MAJ:MIN RM  SIZE RO TYPE  MOUNTPOINT
+        sda                    8:0    0   64G  0 disk
+        ├─sda1                 8:1    0  512M  0 part  /boot/efi
+        ├─sda2                 8:2    0    1K  0 part
+        └─sda5                 8:5    0 63.5G  0 part
+          ├─vgvagrant-root   253:0    0 62.6G  0 lvm   /
+          └─vgvagrant-swap_1 253:1    0  980M  0 lvm   [SWAP]
+        sdb                    8:16   0  2.5G  0 disk
+        ├─sdb1                 8:17   0    2G  0 part
+        │ └─md1                9:1    0    2G  0 raid1
+        │   └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+        └─sdb2                 8:18   0  511M  0 part
+          └─md0                9:0    0  510M  0 raid1
+        sdc                    8:32   0  2.5G  0 disk
+        ├─sdc1                 8:33   0    2G  0 part
+        │ └─md1                9:1    0    2G  0 raid1
+        │   └─vg1-lvol0      253:2    0  100M  0 lvm   /tmp/new
+        └─sdc2                 8:34   0  511M  0 part
+          └─md0                9:0    0  510M  0 raid1
+
 17. Сделайте `--fail` на устройство в вашем RAID1 md.
 
+        vagrant@vagrant:~$ sudo mdadm /dev/md1 --fail /dev/sdb1
+        mdadm: set /dev/sdb1 faulty in /dev/md1
+        
+        vagrant@vagrant:~$ sudo cat /proc/mdstat
+        Personalities : [linear] [multipath] [raid0] [raid1] [raid6] [raid5] [raid4] [raid10]
+        md0 : active raid1 sdc2[1] sdb2[0]
+              522240 blocks super 1.2 [2/2] [UU]
+
+        md1 : active raid1 sdc1[1] sdb1[0](F)
+              2094080 blocks super 1.2 [2/1] [_U]
+
 18. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.
+
+        vagrant@vagrant:~$ dmesg -T |grep md1
+        [Tue Nov 30 20:19:54 2021] md/raid1:md1: not clean -- starting background reconstruction
+        [Tue Nov 30 20:19:54 2021] md/raid1:md1: active with 2 out of 2 mirrors
+        [Tue Nov 30 20:19:54 2021] md1: detected capacity change from 0 to 2144337920
+        [Tue Nov 30 20:19:54 2021] md: resync of RAID array md1
+        [Tue Nov 30 20:20:04 2021] md: md1: resync done.
+        [Tue Nov 30 20:59:11 2021] md/raid1:md1: Disk failure on sdb1, disabling device.
+                                   md/raid1:md1: Operation continuing on 1 devices.
 
 19. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:
 
@@ -225,7 +294,14 @@
     root@vagrant:~# echo $?
     0
     ```
+    
+        vagrant@vagrant:~$ sudo gzip -t /tmp/new/test.gz
+        vagrant@vagrant:~$ sudo echo $?
+        0
 
 20. Погасите тестовый хост, `vagrant destroy`.
 
- 
+         PS D:\installs\Vagrant> vagrant destroy
+            default: Are you sure you want to destroy the 'default' VM? [y/N] y
+        ==> default: Forcing shutdown of VM...
+        ==> default: Destroying VM and associated drives...
