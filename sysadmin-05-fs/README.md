@@ -1,10 +1,50 @@
 1. Узнайте о sparse (разряженных) файлах.
   
-  Выполнено
+      Выполнено
 
 2. Могут ли файлы, являющиеся жесткой ссылкой на один объект, иметь разные права доступа и владельца? Почему?
 
-  
+      Нет, не могут, т.к. жесткая ссылка это ссылка на одну и ту же inode.
+      
+      Проверка:
+      
+        vagrant@vagrant:~$ touch file1
+
+        vagrant@vagrant:~$ stat file1
+          File: file1
+          Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+        Device: fd00h/64768d    Inode: 131096      Links: 1
+        Access: (0664/-rw-rw-r--)  Uid: ( 1000/ vagrant)   Gid: ( 1000/ vagrant)
+        Access: 2021-11-30 16:59:43.876005760 +0000
+        Modify: 2021-11-30 16:59:43.876005760 +0000
+        Change: 2021-11-30 16:59:43.876005760 +0000
+         Birth: -
+
+        vagrant@vagrant:~$ ln file1 file1_hardlink
+
+        vagrant@vagrant:~$ sudo chown root file1
+
+        vagrant@vagrant:~$ sudo chmod a+x file1_hardlink
+
+        vagrant@vagrant:~$ stat file1_hardlink
+          File: file1_hardlink
+          Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+        Device: fd00h/64768d    Inode: 131096      Links: 2
+        Access: (0775/-rwxrwxr-x)  Uid: (    0/    root)   Gid: ( 1000/ vagrant)
+        Access: 2021-11-30 16:59:43.876005760 +0000
+        Modify: 2021-11-30 16:59:43.876005760 +0000
+        Change: 2021-11-30 17:11:51.856031674 +0000
+         Birth: -
+
+        vagrant@vagrant:~$ stat file1
+          File: file1
+          Size: 0               Blocks: 0          IO Block: 4096   regular empty file
+        Device: fd00h/64768d    Inode: 131096      Links: 2
+        Access: (0775/-rwxrwxr-x)  Uid: (    0/    root)   Gid: ( 1000/ vagrant)
+        Access: 2021-11-30 16:59:43.876005760 +0000
+        Modify: 2021-11-30 16:59:43.876005760 +0000
+        Change: 2021-11-30 17:11:51.856031674 +0000
+         Birth: -
 
 3. Сделайте `vagrant destroy` на имеющийся инстанс Ubuntu. Замените содержимое Vagrantfile следующим:
 
