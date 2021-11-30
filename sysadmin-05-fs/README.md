@@ -117,21 +117,90 @@
 
 5. Используя `sfdisk`, перенесите данную таблицу разделов на второй диск.
 
+        vagrant@vagrant:~$ sudo sfdisk -d /dev/sdb | sudo sfdisk /dev/sdc
+        
+        vagrant@vagrant:~$ sudo fdisk -l
+        .......
+        Device     Boot   Start     End Sectors  Size Id Type
+        /dev/sdb1          2048 4196351 4194304    2G 83 Linux
+        /dev/sdb2       4196352 5242879 1046528  511M 83 Linux
+        .......
+        Device     Boot   Start     End Sectors  Size Id Type
+        /dev/sdc1          2048 4196351 4194304    2G 83 Linux
+        /dev/sdc2       4196352 5242879 1046528  511M 83 Linux
+        .......
+
 6. Соберите `mdadm` RAID1 на паре разделов 2 Гб.
+
+        vagrant@vagrant:~$ sudo mdadm --create --verbose /dev/md1 -l 1 -n 2 /dev/sd{b1,c1}
+        mdadm: Note: this array has metadata at the start and
+            may not be suitable as a boot device.  If you plan to
+            store '/boot' on this device please ensure that
+            your boot-loader understands md/v1.x metadata, or use
+            --metadata=0.90
+        mdadm: size set to 2094080K
+        Continue creating array? y
+        mdadm: Defaulting to version 1.2 metadata
+        mdadm: array /dev/md1 started.
 
 7. Соберите `mdadm` RAID0 на второй паре маленьких разделов.
 
+        vagrant@vagrant:~$ sudo mdadm --create --verbose /dev/md0 -l 1 -n 2 /dev/sd{b2,c2}
+        mdadm: Note: this array has metadata at the start and
+            may not be suitable as a boot device.  If you plan to
+            store '/boot' on this device please ensure that
+            your boot-loader understands md/v1.x metadata, or use
+            --metadata=0.90
+        mdadm: size set to 522240K
+        Continue creating array? y
+        mdadm: Defaulting to version 1.2 metadata
+        mdadm: array /dev/md0 started.
+
 8. Создайте 2 независимых PV на получившихся md-устройствах.
+
+        vagrant@vagrant:~$ sudo pvcreate /dev/md1 /dev/md0
+        Physical volume "/dev/md1" successfully created.
+        Physical volume "/dev/md0" successfully created.
 
 9. Создайте общую volume-group на этих двух PV.
 
+        vagrant@vagrant:~$ sudo vgcreate vg1 /dev/md1 /dev/md0
+        Volume group "vg1" successfully created
+
 10. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.
+
+        vagrant@vagrant:~$ sudo lvcreate -L 100M vg1 /dev/md0
+        Logical volume "lvol0" created.
 
 11. Создайте `mkfs.ext4` ФС на получившемся LV.
 
+        vagrant@vagrant:~$ sudo mkfs.ext4 /dev/vg1/lvol0
+        mke2fs 1.45.5 (07-Jan-2020)
+        Creating filesystem with 25600 4k blocks and 25600 inodes
+
+        Allocating group tables: done
+        Writing inode tables: done
+        Creating journal (1024 blocks): done
+        Writing superblocks and filesystem accounting information: done
+
 12. Смонтируйте этот раздел в любую директорию, например, `/tmp/new`.
 
+        vagrant@vagrant:~$ mkdir /tmp/new
+        vagrant@vagrant:~$ sudo mount /dev/vg1/lvol0 /tmp/new
+
 13. Поместите туда тестовый файл, например `wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz`.
+
+        vagrant@vagrant:~$ sudo wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz
+        --2021-11-30 20:42:55--  https://mirror.yandex.ru/ubuntu/ls-lR.gz
+        Resolving mirror.yandex.ru (mirror.yandex.ru)... 213.180.204.183, 2a02:6b8::183
+        Connecting to mirror.yandex.ru (mirror.yandex.ru)|213.180.204.183|:443... connected.
+        HTTP request sent, awaiting response... 200 OK
+        Length: 22574425 (22M) [application/octet-stream]
+        Saving to: ‘/tmp/new/test.gz’
+
+        /tmp/new/test.gz       100%[============================>]  21.53M   281KB/s    in 89s
+
+        2021-11-30 20:44:27 (249 KB/s) - ‘/tmp/new/test.gz’ saved [22574425/22574425]
 
 14. Прикрепите вывод `lsblk`.
 
