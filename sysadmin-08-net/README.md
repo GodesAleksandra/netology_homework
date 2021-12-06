@@ -37,8 +37,8 @@ show bgp x.x.x.x/32
 
 2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
 
-            root@vagrant:~# modprobe -v dummy numdummies=2
-            insmod /lib/modules/5.4.0-80-generic/kernel/drivers/net/dummy.ko numdummies=2 numdummies=0 numdummies=2
+            root@vagrant:~# modprobe -v dummy numdummies=1
+            insmod /lib/modules/5.4.0-80-generic/kernel/drivers/net/dummy.ko numdummies=2 numdummies=0 numdummies=1
 
             root@vagrant:~# lsmod | grep dummy
             dummy                  16384  0
