@@ -37,13 +37,13 @@ show bgp x.x.x.x/32
 
 2. Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.
 
-            root@vagrant:~# modprobe -v dummy numdummies=1
-            insmod /lib/modules/5.4.0-80-generic/kernel/drivers/net/dummy.ko numdummies=1 numdummies=0 numdummies=1
+            root@vagrant:~# modprobe -v dummy numdummies=2
+            insmod /lib/modules/5.4.0-80-generic/kernel/drivers/net/dummy.ko numdummies=2 numdummies=0 numdummies=2
 
             root@vagrant:~# lsmod | grep dummy
             dummy                  16384  0
 
-            root@vagrant:~# ip -c -br link | grep dummy
+            root@vagrant:~# ip -c -br link | grep dummy0
             dummy0           DOWN           62:4c:c2:76:20:bb <BROADCAST,NOARP>
 
             root@vagrant:~# ip link set dummy0 up
@@ -51,7 +51,7 @@ show bgp x.x.x.x/32
             root@vagrant:~# ip route add 172.16.10.0/24 dev dummy0
             root@vagrant:~# ip route add 172.16.12.0/24 dev dummy0
 
-            root@vagrant:~# ip route show | grep dummy
+            root@vagrant:~# ip route show | grep dummy0
             172.16.10.0/24 dev dummy0 scope link
             172.16.12.0/24 dev dummy0 scope link
             192.168.1.0/24 dev dummy0 proto kernel scope link src 192.168.1.150
