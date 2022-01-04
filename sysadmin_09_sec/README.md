@@ -37,31 +37,31 @@
         vagrant@vagrant:~$ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
           > -keyout /etc/ssl/private/apache-selfsigned.key \
           > -out /etc/ssl/certs/apache-selfsigned.crt \
-          > -subj "/C=RU/ST=Moscow/L=Moscow/O=Company Name/OU=Org/CN=www.example.com"
+          > -subj "/C=RU/ST=Moscow/L=Moscow/O=Company Name/OU=Org/CN=www.test.ru"
           Generating a RSA private key
           ..+++++
           .....................................................+++++
           writing new private key to '/etc/ssl/private/apache-selfsigned.key'
           -----
           
-        vagrant@vagrant:~$ sudo nano /etc/apache2/sites-available/www.example.com.conf
+        vagrant@vagrant:~$ sudo nano /etc/apache2/sites-available/www.test.ru.conf
         
         <VirtualHost *:443>
-         ServerName www.example.com
-         DocumentRoot /var/www/www.example.com
+         ServerName www.test.ru
+         DocumentRoot /var/www/www.test.ru
          SSLEngine on
          SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
          SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
         </VirtualHost>
         
-        vagrant@vagrant:~$ sudo mkdir /var/www/www.example.com
+        vagrant@vagrant:~$ sudo mkdir /var/www/www.test.ru
         
-        vagrant@vagrant:~$ sudo nano /var/www/www.example.com/index.html
+        vagrant@vagrant:~$ sudo nano /var/www/www.test.ru/index.html
         
-        <h1>Holla! It worked!</h1>
+        <h1>Holla! It works!</h1>
         
-        vagrant@vagrant:~$ sudo a2ensite www.example.com.conf
-          Enabling site www.example.com.
+        vagrant@vagrant:~$ sudo a2ensite www.test.ru.conf
+          Enabling site www.test.ru.
           To activate the new configuration, you need to run:
             systemctl reload apache2
           
@@ -69,6 +69,18 @@
           Syntax OK
           
         vagrant@vagrant:~$ sudo systemctl reload apache2
+        
+        
+        В Vagrantfile:
+        
+         config.vm.network "forwarded_port", guest: 443, host: 443
+         
+        В etc\hosts:
+        
+        192.168.1.101   test.ru
+
+        
+        Проверяю в браузере: https://www.test.ru/
 
 4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
 
