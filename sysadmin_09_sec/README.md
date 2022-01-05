@@ -83,7 +83,7 @@
         192.168.33.10   test.ru
 
         
-     Проверяю в браузере: https://www.test.ru/
+     Проверяю в браузере: https://test.ru/
         
      Результат:     http://joxi.ru/BA0gNZ0cvyVkQ2
 
