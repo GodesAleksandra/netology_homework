@@ -71,21 +71,21 @@
         vagrant@vagrant:~$ sudo systemctl reload apache2
         
         
-        В Vagrantfile:
+     В Vagrantfile:
         
          config.vm.network "forwarded_port", guest: 443, host: 443
          
          config.vm.network "private_network", ip: "192.168.33.10"
          
         
-        В etc\hosts:
+     В etc\hosts:
         
         192.168.33.10   test.ru
 
         
-        Проверяю в браузере: https://www.test.ru/
+     Проверяю в браузере: https://www.test.ru/
         
-        Результат:     http://joxi.ru/BA0gNZ0cvyVkQ2
+     Результат:     http://joxi.ru/BA0gNZ0cvyVkQ2
 
 4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
 
