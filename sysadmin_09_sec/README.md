@@ -134,6 +134,46 @@
 
 5. Установите на Ubuntu ssh сервер, сгенерируйте новый приватный ключ. Скопируйте свой публичный ключ на другой сервер. Подключитесь к серверу по SSH-ключу.
 
+          vagrant@vagrant:~$ sudo apt install openssh-server
+          
+          vagrant@vagrant:~$ sudo systemctl start sshd.service
+          
+          vagrant@vagrant:~$ sudo systemctl enable sshd.service
+          
+          vagrant@vagrant:~$ ssh-keygen
+            Generating public/private rsa key pair.
+            Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
+            Enter passphrase (empty for no passphrase):
+            Enter same passphrase again:
+            Your identification has been saved in /home/vagrant/.ssh/id_rsa
+            Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub
+            The key fingerprint is:
+            SHA256:l6n6/lHBftNpihIFIG/wWemCObTD9TCRsOYZMnauy8U vagrant@vagrant
+            The key's randomart image is:
+            +---[RSA 3072]----+
+            |     +.o+o.      |
+            |     .*=o...     |
+            |   +o====  .o    |
+            |  . BB+. o.+ . ..|
+            |     +o S.+ o oo.|
+            |    o    o....o. |
+            |   . E  .... .   |
+            |  . o  .  ..     |
+            |   o  .oo..      |
+            +----[SHA256]-----+
+          
+          vagrant@vagrant:~$ ssh-copy-id vagrant@127.0.0.1
+            /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/vagrant/.ssh/id_rsa.pub"
+            /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+            /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+            vagrant@127.0.0.1's password:
+
+            Number of key(s) added: 1
+
+            Now try logging into the machine, with:   "ssh 'vagrant@127.0.0.1'"
+            and check to make sure that only the key(s) you wanted were added.
+            
+          
           
  
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
