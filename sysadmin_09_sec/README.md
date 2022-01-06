@@ -194,9 +194,8 @@
            HostName 127.0.0.1
            IdentityFile ~/.ssh/id_rsa_new
            User vagrant
-           Port 2222
           
-          vagrant@vagrant:~$ ssh vagrant
+          vagrant@vagrant:~$ ssh my_server
             The authenticity of host 'vagrant (127.0.1.1)' can't be established.
             ...
             Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-80-generic x86_64)
@@ -204,4 +203,4 @@
             
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
 
-  
+            
