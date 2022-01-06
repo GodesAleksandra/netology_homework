@@ -167,13 +167,15 @@
             /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
             /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
             vagrant@127.0.0.1's password:
-
             Number of key(s) added: 1
-
             Now try logging into the machine, with:   "ssh 'vagrant@127.0.0.1'"
             and check to make sure that only the key(s) you wanted were added.
             
+     Подключение к серверу по SSH-ключу:
           
+          vagrant@vagrant:~$ ssh 'vagrant@127.0.0.1'
+            Enter passphrase for key '/home/vagrant/.ssh/id_rsa':
+            Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-80-generic x86_64)
           
  
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
