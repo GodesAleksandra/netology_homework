@@ -180,7 +180,15 @@
  
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
 
-  
+          vagrant@vagrant:~$ mv ~/.ssh ~/.ssh_old
+          
+          vagrant@vagrant:~$ mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          
+          vagrant@vagrant:~$ touch ~/.ssh/config && chmod 600 ~/.ssh/config
+          
+          
+          
+          
 
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
 
