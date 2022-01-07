@@ -81,7 +81,82 @@
 
         vagrant@vagrant:~$ sudo apt-get install jq
         
+    Запуск vault от root в фоновом режиме:
+    
+        vagrant@vagrant:~$ screen
         
+        vagrant@vagrant:~$ vault server -dev -dev-root-token-id=root
+        
+    Нажать Ctrl + a + d, чтобы отделить процесс от сессии терминала.
+        
+        vagrant@vagrant:~$ export VAULT_ADDR=http://127.0.0.1:8200
+        
+        vagrant@vagrant:~$ export VAULT_TOKEN=root
+        
+        vagrant@vagrant:~$ tee admin-policy.hcl <<EOF
+        > # Read system health check
+        > path "sys/health"
+        > {
+        >   capabilities = ["read", "sudo"]
+        > }
+        >
+        > # Create and manage ACL policies broadly across Vault
+        >
+        > # List existing policies
+        > path "sys/policies/acl"
+        > {
+        >   capabilities = ["list"]
+        > }
+        >
+        > # Create and manage ACL policies
+        > path "sys/policies/acl/*"
+        > {
+        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+        > }
+        >
+        > # Enable and manage authentication methods broadly across Vault
+        >
+        > # Manage auth methods broadly across Vault
+        > path "auth/*"
+        > {
+        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+        > }
+        >
+        > # Create, update, and delete auth methods
+        > path "sys/auth/*"
+        > {
+        >   capabilities = ["create", "update", "delete", "sudo"]
+        > }
+        >
+        > # List auth methods
+        > path "sys/auth"
+        > {
+        >   capabilities = ["read"]
+        > }
+        >
+        > # Enable and manage the key/value secrets engine at `secret/` path
+        >
+        > # List, create, update, and delete key/value secrets
+        > path "secret/*"
+        > {
+        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+        > }
+        >
+        > # Manage secrets engines
+        > path "sys/mounts/*"
+        > {
+        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+        > }
+        >
+        > # List existing secrets engines.
+        > path "sys/mounts"
+        > {
+        >   capabilities = ["read"]
+        > }
+        > EOF
+
+    vagrant@vagrant:~$ vault policy write admin admin-policy.hcl
+        Success! Uploaded policy: admin
 
 5. Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
 
