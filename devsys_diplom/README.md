@@ -5,6 +5,43 @@
 2. Установите ufw и разрешите к этой машине сессии на порты 22 и 443, при этом трафик на интерфейсе localhost (lo) должен ходить свободно на все порты.
 
         vagrant@vagrant:~$ sudo apt install ufw
+        
+        vagrant@vagrant:~$ sudo ufw allow 2222
+            Rules updated
+            Rules updated (v6)
+            
+        vagrant@vagrant:~$ sudo ufw allow 443
+            Rules updated
+            Rules updated (v6)
+            
+        vagrant@vagrant:~$ sudo ufw enable
+            Command may disrupt existing ssh connections. Proceed with operation (y|n)? y
+            Firewall is active and enabled on system startup
+            
+        vagrant@vagrant:~$ sudo ufw status verbose
+            Status: active
+            Logging: on (low)
+            Default: deny (incoming), allow (outgoing), disabled (routed)
+            New profiles: skip
+
+            To                         Action      From
+            --                         ------      ----
+            2222                       ALLOW IN    Anywhere
+            443                        ALLOW IN    Anywhere
+            2222 (v6)                  ALLOW IN    Anywhere (v6)
+            443 (v6)                   ALLOW IN    Anywhere (v6)
+            
+     Проверка траффика с localhost на остальные порты:
+     
+        vagrant@vagrant:~$ ping -I 127.0.0.1 10.0.2.15
+            PING 10.0.2.15 (10.0.2.15) from 127.0.0.1 : 56(84) bytes of data.
+            ...
+            5 packets transmitted, 5 received, 0% packet loss, time 4366ms
+        
+        vagrant@vagrant:~$ ping -I 127.0.0.1 192.168.33.10
+            PING 192.168.33.10 (192.168.33.10) from 127.0.0.1 : 56(84) bytes of data.
+            ...
+            3 packets transmitted, 3 received, 0% packet loss, time 2044ms
 
 3. Установите hashicorp vault.
 
