@@ -231,14 +231,64 @@
 
 6. Установите nginx.
 
-    
+        root@vagrant:/home/vagrant# apt install nginx
+        
+        root@vagrant:/home/vagrant# systemctl status nginx
+            ● nginx.service - A high performance web server and a reverse proxy server
+                 Loaded: loaded (/lib/systemd/system/nginx.service; enabled; vendor preset: enabled)
+                 Active: active (running) since Fri 2022-01-07 22:44:57 UTC; 6min ago
+                   Docs: man:nginx(8)
+               Main PID: 3969 (nginx)
+                  Tasks: 3 (limit: 1071)
+                 Memory: 4.3M
+                 CGroup: /system.slice/nginx.service
+                         ├─3969 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+                         ├─3970 nginx: worker process
+                         └─3971 nginx: worker process
+
+    Создадим домашнюю страницу:
+        
+        root@vagrant:/home/vagrant# nano /var/www/html/index.html
+        
+        <html>
+            <head>
+                <title>Добро пожаловать!</title>
+            </head>
+            <body>
+                <h1>Поздравляю! Сервер работает!</h1>
+            </body>
+        </html>
+        
 
 7. По инструкции настройте nginx на https, используя ранее подготовленный сертификат:
   - можно использовать стандартную стартовую страницу nginx для демонстрации работы сервера;
   - можно использовать и другой html файл, сделанный вами;
 
-    
+        root@vagrant:/home/vagrant# nano /etc/nginx/sites-available/default
+        
+        server {
+                listen 80 default_server;
+                listen [::]:80 default_server;
 
+                listen 443 ssl default_server;
+                listen [::]:443 ssl default_server;
+                server_name   test.example.com;
+                ssl_certificate     test_example.crt;
+                ssl_certificate_key test_example.key;
+                ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+                ssl_ciphers         HIGH:!aNULL:!MD5;
+
+                root /var/www/html;
+
+                index index.html index.htm index.nginx-debian.html;
+
+                server_name _;
+
+                location / {
+                        try_files $uri $uri/ =404;
+                }
+        }
+        
 8. Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.
 
     
