@@ -207,15 +207,15 @@
         >      max_ttl="720h"
             Success! Data written to: pki_int/roles/example-dot-com
             
-    Создаем 30-дневный сертификат test.example.com, основанный на роли example-dot-com и запись в файл test_example.crt:
+    Создаем 30-дневный сертификат test.example.com, основанный на роли example-dot-com и записываем в файл test_example.crt:
     
         root@vagrant:/home/vagrant# vault write -format=json pki_int/issue/example-dot-com common_name="test.example.com" ttl="720h" > /etc/ssl/test_example.crt
         
-    Запись промежуточного сертификата в файл test_example.crt.pem:
+    Запись корневого сертификата в файл test_example.crt.pem:
         
         root@vagrant:/home/vagrant# cat /etc/ssl/test_example.crt | jq -r .data.certificate > /etc/ssl/test_example.crt.pem
-        
-        root@vagrant:/home/vagrant# cat /etc/ssl/test_example.crt | jq -r .data.ca_chain >> /etc/ssl/test_example.crt.pem
+
+        root@vagrant:/home/vagrant# cat /etc/ssl/test_example.crt | jq -r .data.ca_chain[] >> /etc/ssl/test_example.crt.pem
         
     Запись private ключа в файл test_example.key:
     
@@ -223,7 +223,7 @@
 
 5. Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
 
-    
+        
 
 6. Установите nginx.
 
