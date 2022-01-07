@@ -159,11 +159,11 @@
             >   capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
             > }
             > EOF
-            
-    Генерируем корневой сертификат CA_cert.crt:
 
         vagrant@vagrant:~$ vault policy write admin admin-policy.hcl
             Success! Uploaded policy: admin
+            
+    Генерируем корневой сертификат CA_cert.crt:
             
         vagrant@vagrant:~$ vault secrets enable pki
             Success! Enabled the pki secrets engine at: pki/
@@ -180,7 +180,7 @@
         >      crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
         Success! Data written to: pki/config/urls
         
-    Генерируем промежуточный сертификат:
+    Генерируем промежуточный сертификат intermediate.cert.pem:
     
         vagrant@vagrant:~$ vault secrets enable -path=pki_int pki
             Success! Enabled the pki secrets engine at: pki_int/
@@ -199,7 +199,15 @@
         vagrant@vagrant:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
             Success! Data written to: pki_int/intermediate/set-signed
             
-    Создаем роль:
+    Создаем роль, которая разрешает субдомены:
+    
+        vagrant@vagrant:~$ vault write pki_int/roles/example-dot-com \
+        >      allowed_domains="example.com" \
+        >      allow_subdomains=true \
+        >      max_ttl="720h"
+            Success! Data written to: pki_int/roles/example-dot-com
+            
+    Создаем 30-дневный сертификат test.example.com, основанный на роли example-dot-com:
     
         
 
