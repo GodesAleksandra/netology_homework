@@ -94,69 +94,114 @@
         vagrant@vagrant:~$ export VAULT_TOKEN=root
         
         vagrant@vagrant:~$ tee admin-policy.hcl <<EOF
-        > # Read system health check
-        > path "sys/health"
-        > {
-        >   capabilities = ["read", "sudo"]
-        > }
-        >
-        > # Create and manage ACL policies broadly across Vault
-        >
-        > # List existing policies
-        > path "sys/policies/acl"
-        > {
-        >   capabilities = ["list"]
-        > }
-        >
-        > # Create and manage ACL policies
-        > path "sys/policies/acl/*"
-        > {
-        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-        > }
-        >
-        > # Enable and manage authentication methods broadly across Vault
-        >
-        > # Manage auth methods broadly across Vault
-        > path "auth/*"
-        > {
-        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-        > }
-        >
-        > # Create, update, and delete auth methods
-        > path "sys/auth/*"
-        > {
-        >   capabilities = ["create", "update", "delete", "sudo"]
-        > }
-        >
-        > # List auth methods
-        > path "sys/auth"
-        > {
-        >   capabilities = ["read"]
-        > }
-        >
-        > # Enable and manage the key/value secrets engine at `secret/` path
-        >
-        > # List, create, update, and delete key/value secrets
-        > path "secret/*"
-        > {
-        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-        > }
-        >
-        > # Manage secrets engines
-        > path "sys/mounts/*"
-        > {
-        >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
-        > }
-        >
-        > # List existing secrets engines.
-        > path "sys/mounts"
-        > {
-        >   capabilities = ["read"]
-        > }
-        > EOF
+            > # Read system health check
+            > path "sys/health"
+            > {
+            >   capabilities = ["read", "sudo"]
+            > }
+            >
+            > # Create and manage ACL policies broadly across Vault
+            >
+            > # List existing policies
+            > path "sys/policies/acl"
+            > {
+            >   capabilities = ["list"]
+            > }
+            >
+            > # Create and manage ACL policies
+            > path "sys/policies/acl/*"
+            > {
+            >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            > }
+            >
+            > # Enable and manage authentication methods broadly across Vault
+            >
+            > # Manage auth methods broadly across Vault
+            > path "auth/*"
+            > {
+            >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            > }
+            >
+            > # Create, update, and delete auth methods
+            > path "sys/auth/*"
+            > {
+            >   capabilities = ["create", "update", "delete", "sudo"]
+            > }
+            >
+            > # List auth methods
+            > path "sys/auth"
+            > {
+            >   capabilities = ["read"]
+            > }
+            >
+            > # Enable and manage the key/value secrets engine at `secret/` path
+            >
+            > # List, create, update, and delete key/value secrets
+            > path "secret/*"
+            > {
+            >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            > }
+            >
+            > # Manage secrets engines
+            > path "sys/mounts/*"
+            > {
+            >   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+            > }
+            >
+            > # List existing secrets engines.
+            > path "sys/mounts"
+            > {
+            >   capabilities = ["read", "list"]
+            > }
+            > 
+            > # Work with pki secrets engine
+            > path "pki*" {
+            >   capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
+            > }
+            > EOF
+            
+    Генерируем корневой сертификат CA_cert.crt:
 
-    vagrant@vagrant:~$ vault policy write admin admin-policy.hcl
-        Success! Uploaded policy: admin
+        vagrant@vagrant:~$ vault policy write admin admin-policy.hcl
+            Success! Uploaded policy: admin
+            
+        vagrant@vagrant:~$ vault secrets enable pki
+            Success! Enabled the pki secrets engine at: pki/
+        
+        vagrant@vagrant:~$ vault secrets tune -max-lease-ttl=87600h pki
+            Success! Tuned the secrets engine at: pki/
+    
+        vagrant@vagrant:~$ vault write -field=certificate pki/root/generate/internal \
+        >      common_name="example.com" \
+        >      ttl=87600h > CA_cert.crt
+
+        vagrant@vagrant:~$ vault write pki/config/urls \
+        >      issuing_certificates="$VAULT_ADDR/v1/pki/ca" \
+        >      crl_distribution_points="$VAULT_ADDR/v1/pki/crl"
+        Success! Data written to: pki/config/urls
+        
+    Генерируем промежуточный сертификат:
+    
+        vagrant@vagrant:~$ vault secrets enable -path=pki_int pki
+            Success! Enabled the pki secrets engine at: pki_int/
+        
+        vagrant@vagrant:~$ vault secrets tune -max-lease-ttl=43800h pki_int
+            Success! Tuned the secrets engine at: pki_int/
+        
+        vagrant@vagrant:~$ vault write -format=json pki_int/intermediate/generate/internal \
+            >      common_name="example.com Intermediate Authority" \
+            >      | jq -r '.data.csr' > pki_intermediate.csr
+        
+        vagrant@vagrant:~$ vault write -format=json pki/root/sign-intermediate csr=@pki_intermediate.csr \
+            >      format=pem_bundle ttl="43800h" \
+            >      | jq -r '.data.certificate' > intermediate.cert.pem
+        
+        vagrant@vagrant:~$ vault write pki_int/intermediate/set-signed certificate=@intermediate.cert.pem
+            Success! Data written to: pki_int/intermediate/set-signed
+            
+    Создаем роль:
+    
+        
 
 5. Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
 
