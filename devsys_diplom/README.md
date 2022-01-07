@@ -223,7 +223,11 @@
 
 5. Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
 
-        
+        root@vagrant:/home/vagrant# mv /etc/ssl/test_example.crt.pem /vagrant
+    
+    Сертификат установлен вручную через Менеджер сертификатов certmgr.msc в Windows
+    
+    ![image1](http://joxi.ru/bmoanwzS7pnzxA.jpg)
 
 6. Установите nginx.
 
