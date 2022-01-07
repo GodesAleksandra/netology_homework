@@ -1,6 +1,19 @@
 1. Создайте виртуальную машину Linux.
 
     Выполнено
+    
+    Vadrantfile:
+    
+        Vagrant.configure("2") do |config|
+          config.vm.box = "bento/ubuntu-20.04"
+          config.vm.network "forwarded_port", guest: 443, host: 443
+          config.vm.network "private_network", ip: "192.168.33.10"
+          config.vm.provider "virtualbox" do |v|
+               v.memory = 1024
+               v.cpus = 2
+          end
+        end
+
 
 2. Установите ufw и разрешите к этой машине сессии на порты 22 и 443, при этом трафик на интерфейсе localhost (lo) должен ходить свободно на все порты.
 
@@ -45,7 +58,24 @@
 
 3. Установите hashicorp vault.
 
-    
+        vagrant@vagrant:~$ curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+            OK
+
+        vagrant@vagrant:~$ sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+            ...
+            Fetched 9,132 kB in 14s (665 kB/s)
+            Reading package lists... Done
+
+        vagrant@vagrant:~$ sudo apt-get update && sudo apt-get install vault
+            ...
+            Vault TLS key and self-signed certificate have been generated in '/opt/vault/tls'.
+            
+     Проверка:
+     
+        vagrant@vagrant:~$ vault
+            Usage: vault <command> [args]
+            ...
+
 
 4. Cоздайте центр сертификации по инструкции и выпустите сертификат для использования его в настройке веб-сервера nginx (срок жизни сертификата - месяц).
 
