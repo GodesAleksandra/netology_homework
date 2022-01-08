@@ -246,16 +246,22 @@
                          ├─3970 nginx: worker process
                          └─3971 nginx: worker process
 
+        root@vagrant:/home/vagrant# sudo mkdir -p /var/www/example/html
+        
+        root@vagrant:/home/vagrant# sudo chown -R $USER:$USER /var/www/example/html
+        
+        root@vagrant:/home/vagrant# sudo chmod -R 755 /var/www/example
+    
     Создадим домашнюю страницу:
         
-        root@vagrant:/home/vagrant# nano /var/www/html/index.html
+        root@vagrant:/home/vagrant# nano /var/www/example/html/index.html
         
         <html>
             <head>
                 <title>Добро пожаловать!</title>
             </head>
             <body>
-                <h1>Поздравляю! Сервер работает!</h1>
+                <h1>Молодец! Сервер работает!</h1>
             </body>
         </html>
         
@@ -264,30 +270,25 @@
   - можно использовать стандартную стартовую страницу nginx для демонстрации работы сервера;
   - можно использовать и другой html файл, сделанный вами;
 
-        root@vagrant:/home/vagrant# nano /etc/nginx/sites-available/default
+        root@vagrant:/home/vagrant# nano /etc/nginx/sites-available/example
         
         server {
-                listen 80 default_server;
-                listen [::]:80 default_server;
+              listen              80;
+              listen              443 ssl;
 
-                listen 443 ssl default_server;
-                listen [::]:443 ssl default_server;
-                server_name   test.example.com;
-                ssl_certificate     test_example.crt;
-                ssl_certificate_key test_example.key;
-                ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
-                ssl_ciphers         HIGH:!aNULL:!MD5;
+              server_name         www.test.example.com test.example.com;
+              ssl_certificate     test_example.crt;
+              ssl_certificate_key test_example.key;
 
-                root /var/www/html;
+               root /var/www/example/html;
+               index index.html;
 
-                index index.html index.htm index.nginx-debian.html;
-
-                server_name _;
-
-                location / {
-                        try_files $uri $uri/ =404;
-                }
+               location / {
+                       try_files $uri $uri/ =404;
+               }
         }
+        
+        root@vagrant:/home/vagrant# ln -s /etc/nginx/sites-available/example /etc/nginx/sites-enabled/
         
 8. Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.
 
