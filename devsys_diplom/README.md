@@ -227,7 +227,7 @@
     
     Сертификат установлен вручную через Менеджер сертификатов certmgr.msc в Windows
     
-    ![image1](http://joxi.ru/Q2KOG6YHyV6532.jpg)
+    
 
 6. Установите nginx.
 
