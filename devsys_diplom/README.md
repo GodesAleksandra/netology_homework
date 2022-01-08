@@ -223,7 +223,7 @@
 
 5. Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
 
-        root@vagrant:/home/vagrant# mv /etc/ssl/test_example.crt.pem /vagrant
+        root@vagrant:/home/vagrant# cp /etc/ssl/test_example.crt.pem /vagrant
     
     Сертификат установлен вручную через Менеджер сертификатов certmgr.msc в Windows
     
@@ -258,10 +258,10 @@
         
         <html>
             <head>
-                <title>Добро пожаловать!</title>
+                <title>Welcome!</title>
             </head>
             <body>
-                <h1>Молодец! Сервер работает!</h1>
+                <h1>Success! Server is available!</h1>
             </body>
         </html>
         
@@ -277,8 +277,8 @@
               listen              443 ssl;
 
               server_name         www.test.example.com test.example.com;
-              ssl_certificate     test_example.crt.pem;
-              ssl_certificate_key test_example.key;
+              ssl_certificate     /etc/ssl/test_example.crt.pem;
+              ssl_certificate_key /etc/ssl/test_example.key;
 
                root /var/www/example/html;
                index index.html;
