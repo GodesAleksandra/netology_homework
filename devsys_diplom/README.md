@@ -211,7 +211,7 @@
     
         root@vagrant:/home/vagrant# vault write -format=json pki_int/issue/example-dot-com common_name="test.example.com" ttl="720h" > /etc/ssl/test_example.crt
         
-    Запись корневого сертификата в файл test_example.crt.pem:
+    Запись сертификата в файл test_example.crt.pem:
         
         root@vagrant:/home/vagrant# cat /etc/ssl/test_example.crt | jq -r .data.certificate > /etc/ssl/test_example.crt.pem
 
@@ -223,11 +223,11 @@
 
 5. Установите корневой сертификат созданного центра сертификации в доверенные в хостовой системе.
 
-        root@vagrant:/home/vagrant# cp /etc/ssl/test_example.crt.pem /vagrant
+        root@vagrant:/home/vagrant# cp CA_cert.crt /vagrant
     
     Сертификат установлен вручную через Менеджер сертификатов certmgr.msc в Windows
     
-    ![image1](http://joxi.ru/bmoanwzS7pnzxA.jpg)
+    ![image1](http://joxi.ru/Q2KOG6YHyV6532.jpg)
 
 6. Установите nginx.
 
@@ -298,7 +298,7 @@
         
 8. Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.
 
-    
+        ![image1](http://joxi.ru/8230E3xtaNQVOA.jpg)
 
 9. Создайте скрипт, который будет генерировать новый сертификат в vault:
   - генерируем новый сертификат так, чтобы не переписывать конфиг nginx;
