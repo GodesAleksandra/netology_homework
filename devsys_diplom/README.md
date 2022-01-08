@@ -277,7 +277,7 @@
               listen              443 ssl;
 
               server_name         www.test.example.com test.example.com;
-              ssl_certificate     test_example.crt;
+              ssl_certificate     test_example.crt.pem;
               ssl_certificate_key test_example.key;
 
                root /var/www/example/html;
@@ -289,6 +289,12 @@
         }
         
         root@vagrant:/home/vagrant# ln -s /etc/nginx/sites-available/example /etc/nginx/sites-enabled/
+        
+        root@vagrant:/home/vagrant# nginx -t
+            nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+            nginx: configuration file /etc/nginx/nginx.conf test is successful
+            
+        root@vagrant:/home/vagrant# systemctl restart nginx
         
 8. Откройте в браузере на хосте https адрес страницы, которую обслуживает сервер nginx.
 
