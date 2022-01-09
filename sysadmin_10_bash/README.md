@@ -76,7 +76,7 @@ do
 	do
 		curl $addr:80 >/dev/null
 		status=$?
-		if ((status != 0))
+		if (($status != 0))
 		then
 			echo $addr error >> error.log
 		fi
