@@ -22,6 +22,10 @@
         vagrant@vagrant:~$ sudo ufw allow 2222
             Rules updated
             Rules updated (v6)
+        
+        vagrant@vagrant:~$ sudo ufw allow 22
+            Rules updated
+            Rules updated (v6)
             
         vagrant@vagrant:~$ sudo ufw allow 443
             Rules updated
@@ -40,8 +44,10 @@
             To                         Action      From
             --                         ------      ----
             2222                       ALLOW IN    Anywhere
+            22                         ALLOW IN    Anywhere
             443                        ALLOW IN    Anywhere
             2222 (v6)                  ALLOW IN    Anywhere (v6)
+            22 (v6)                    ALLOW IN    Anywhere (v6)
             443 (v6)                   ALLOW IN    Anywhere (v6)
             
      Проверка траффика с localhost на остальные порты:
@@ -304,8 +310,31 @@
   - генерируем новый сертификат так, чтобы не переписывать конфиг nginx;
   - перезапускаем nginx для применения нового сертификата.
 
-    
+        root@vagrant:/home/vagrant# nano /home/scripts/refresh_cert.sh
+        
+        #!/usr/bin/env bash
+        export VAULT_ADDR=http://127.0.0.1:8200
+        export VAULT_TOKEN=root
+        vault status > /dev/null 2>&1
+        if [[ $? == "0" ]]
+        then
+          vault write -format=json pki_int/issue/example-dot-com common_name="test.example.com" ttl="720h" > /etc/ssl/test_example.crt
+          if [[ $? == "0" ]]
+          then
+            cat /etc/ssl/test_example.crt | jq -r .data.certificate > /etc/ssl/test_example.crt.pem
+            cat /etc/ssl/test_example.crt | jq -r .data.ca_chain[] >> /etc/ssl/test_example.crt.pem
+            cat /etc/ssl/test_example.crt | jq -r .data.private_key > /etc/ssl/test_example.key
+            systemctl restart nginx
+          else
+            echo "Error during generating keys"
+            exit 1
+          fi
+        else
+          echo "Vault isn't unsealed"
+          exit 1
+        fi
 
 10. Поместите скрипт в crontab, чтобы сертификат обновлялся какого-то числа каждого месяца в удобное для вас время.
 
-    
+        root@vagrant:/home/vagrant# crontab -e
+        0 4 30 * * /home/scripts/refresh_cert.sh
