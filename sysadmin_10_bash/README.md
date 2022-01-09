@@ -53,13 +53,13 @@ done
 array_address=(192.168.0.1 173.194.222.113 87.250.250.242)
 for addr in ${array_address[@]}
 do
-n=5
-while (($n > 0))
-do
-curl $addr:80
-echo $addr check_status=$? >> hosts.log
-let "n -= 1"
-done
+	n=5
+	while (($n > 0))
+	do
+		curl $addr:80
+		echo $addr check_status=$? >> hosts.log
+		let "n -= 1"
+	done
 done
 ```
 
@@ -68,6 +68,19 @@ done
 
 ### Ваш скрипт:
 ```bash
-???
+array_address=(192.168.0.1 173.194.222.113 87.250.250.242)
+status=0
+while (($status == 0))
+do
+	for addr in ${array_address[@]}
+	do
+		curl $addr:80 >/dev/null
+		status=$?
+		if ((status != 0))
+		then
+			echo $addr error >> error.log
+		fi
+	done
+done
 ```
 
