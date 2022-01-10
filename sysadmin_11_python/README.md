@@ -63,7 +63,11 @@ README.md
 import os
 import sys
 
-path = sys.argv[1]
+path = os.getcwd()+'/netology'
+
+if len(sys.argv)>=2:
+    path = sys.argv[1]
+
 bash_command = ['cd '+path, 'git status']
 result_os = os.popen(' && '.join(bash_command)).read()
 for result in result_os.split('\n'):
@@ -77,6 +81,10 @@ for result in result_os.split('\n'):
 vagrant@vagrant:~$ python3 /1.py ~/netology/
 /home/vagrant/netology/README.md
 /home/vagrant/netology/01-intro-01/netology.sh
+
+vagrant@vagrant:~$ python3 /1.py
+/home/vagrant/netologyREADME.md
+/home/vagrant/netology01-intro-01/netology.sh
 ```
 
 ## Обязательная задача 4
@@ -84,8 +92,34 @@ vagrant@vagrant:~$ python3 /1.py ~/netology/
 
 ### Ваш скрипт:
 ```python
-???
+#!/usr/bin/env python3
+
+import socket as s
+import json
+
+file = 'servers.json'
+servers = ['drive.google.com', 'mail.google.com', 'google.com']
+error = ''
+data_json = ''
+
+with open(file, 'r') as outfile:
+    file_json = json.load(outfile)
+
+for sv in servers:
+    ip_cur = s.gethostbyname(sv)
+    ip_prev = file_json[sv]
+    data_json = data_json + '"'+sv+'":"'+ip_cur+'",'
+    if ip_prev != ip_cur:
+        error = error + ', ' + sv + ' IP mismatch: ' + ip_prev + ' ' + ip_cur
+    
+if error is not None:
+    with open(file, "w") as write_file:
+        json.dump('{'+data_json[:-1]+'}', write_file)
+        
+    print('[ERROR]'+error)
 ```
+
+json.loads('{"drive.google.com":"01.01.01.01","mail.google.com":"02.02.02.02","google.com":"03.03.03.03"}')
 
 ### Вывод скрипта при запуске при тестировании:
 ```
