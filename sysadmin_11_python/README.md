@@ -103,25 +103,23 @@ error = ''
 data_json = ''
 
 with open(file, 'r') as outfile:
-    file_json = json.load(outfile)
+        file_json = json.load(outfile)
 
 for sv in servers:
-    ip_cur = s.gethostbyname(sv)
-    ip_prev = file_json[sv]
-    data_json = data_json + '"'+sv+'":"'+ip_cur+'",'
-    if ip_prev != ip_cur:
-        error = error + ', ' + sv + ' IP mismatch: ' + ip_prev + ' ' + ip_cur
-    
-if error is not None:
-    with open(file, "w") as write_file:
-        json.dump('{'+data_json[:-1]+'}', write_file)
-        
-    print('[ERROR]'+error)
-```
+        ip_cur = s.gethostbyname(sv)
+        ip_prev = file_json[sv]
+        data_json = data_json + '"' + sv + '":"' + ip_cur + '",'
+        if ip_prev != ip_cur:
+                error = error + ', ' + sv + ' IP mismatch: ' + ip_prev + ' ' + ip_cur
 
-json.loads('{"drive.google.com":"01.01.01.01","mail.google.com":"02.02.02.02","google.com":"03.03.03.03"}')
+if error:
+        with open(file, "w") as write_file:
+                write_file.write('{'+data_json[:-1]+'}')
+        print('[ERROR]'+error[1:])
+```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+vagrant@vagrant:~$ python3 /1.py
+[ERROR] mail.google.com IP mismatch: 142.250.185.133 142.250.74.197, google.com IP mismatch: 142.250.185.238 142.250.186.110
 ```
