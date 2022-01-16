@@ -42,39 +42,45 @@
 
 import socket as s
 import json
+import yaml
 
-file = 'servers.json'
+file_json = 'servers.json'
+file_yml = 'servers.yml'
 servers = ['drive.google.com', 'mail.google.com', 'google.com']
 error = ''
-data_json = ''
+data = {}
 
-with open(file, 'r') as outfile:
-        file_json = json.load(outfile)
+with open(file_json, 'r') as outfile:
+        file = json.load(outfile)
 
 for sv in servers:
         ip_cur = s.gethostbyname(sv)
-        ip_prev = file_json[sv]
-        data_json = data_json + '"' + sv + '":"' + ip_cur + '",'
+        ip_prev = file[sv]
+        data[sv] = ip_cur
         if ip_prev != ip_cur:
                 error = error + ', ' + sv + ' IP mismatch: ' + ip_prev + ' ' + ip_cur
 
 if error:
-        with open(file, "w") as write_file:
-                write_file.write('{'+data_json[:-1]+'}')
+        with open(file_yml, "w") as write_file:
+                yaml.dump(data, write_file)
+        with open(file_json, "w") as write_file:
+                json.dump(data, write_file)
         print('[ERROR]'+error[1:])
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+[ERROR] drive.google.com IP mismatch: 216.58.212.142 142.250.186.110, mail.google.com IP mismatch: 142.250.74.197 142.250.186.133, google.com IP mismatch: 142.250.186.110 172.217.16.142
 ```
 
 ### json-файл(ы), который(е) записал ваш скрипт:
 ```json
-???
+{"drive.google.com": "142.250.186.110", "mail.google.com": "142.250.186.133", "google.com": "172.217.16.142"}
 ```
 
 ### yml-файл(ы), который(е) записал ваш скрипт:
 ```yaml
-???
+drive.google.com: 142.250.186.110
+google.com: 172.217.16.142
+mail.google.com: 142.250.186.133
 ```
